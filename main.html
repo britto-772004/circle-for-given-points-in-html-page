@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Circle with Points and Distances</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        h3{
+            text-align: center;
+        }
+        
+    </style>
+</head>
+<body>
+    <h3 id="confirmation"></h3>
+    <canvas id="myCanvas" width="1600" height="1600"></canvas>
+    <script>
+
+        //this function will draw the circle with points
+        function drawCircleWithPoints(point_list) {
+            const canvas = document.getElementById('myCanvas');
+            const context = canvas.getContext('2d');
+
+            // Static point coordinates (center of the canvas)
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Circle radius in pixels (20 meters)
+            const circleRadius = 200; // Increased to 200 pixels for better visibility
+
+            // Distances of the 5 points from the static point in meters
+            // const distances = [20, 10, 10, 20, 35];
+            const distances = point_list;
+
+            // Convert distances to pixels (1 meter = 10 pixels for better visibility)
+            const distanceInPixels = distances.map(distance => distance * 10);
+
+            // Draw the circle
+            context.beginPath();
+            context.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI, false);
+            // context.fillStyle = 'rgba(0, 0, 255, 0.5)'; // Fill color
+            // context.fill();
+            context.lineWidth = 4; // Increased line width for better visibility
+            var flag=0;
+            for(let i=0;i<distances.length;i++){
+                if(distances[i] > 20){
+                    flag=0;
+                    break;
+                }
+                else{
+                    flag=1;
+                }
+            }
+
+            if(flag == 1){
+            context.strokeStyle = 'green'; // points are lesser than radius
+            context.stroke();
+            document.getElementById("confirmation").innerHTML="All students are near to bus ";
+            }
+
+            else if (flag ==0){
+                context.strokeStyle = "red" // points are greater than radius
+                context.stroke();
+                document.getElementById("confirmation").innerHTML="some students are away from the bus";
+            }
+
+            // Draw the points and lines
+            for (let i = 0; i < distanceInPixels.length; i++) {
+                const angle = (i / distanceInPixels.length) * 2 * Math.PI;
+                const pointX = centerX + distanceInPixels[i] * Math.cos(angle);
+                const pointY = centerY + distanceInPixels[i] * Math.sin(angle);
+
+                // Draw the line from the center to the point
+                context.beginPath();
+                context.moveTo(centerX, centerY);
+                context.lineTo(pointX, pointY);
+                context.strokeStyle = 'black';
+                context.stroke();
+
+                // Draw the point
+                context.beginPath();
+                context.arc(pointX, pointY, 5, 0, 2 * Math.PI, false); // Increased point size for better visibility
+                context.fillStyle = 'red';
+                context.fill();
+
+                // Display the distance
+                context.fillStyle = 'black';
+                context.font = '16px Arial'; // Increased font size for better visibility
+                context.fillText(`${distances[i]} meters`, pointX + 10, pointY);
+            }
+        }
+
+        // method to find the distance between to points 
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distanceKm = R * c;
+            const distanceM = distanceKm * 1000; // Convert to meters
+            return distanceM;
+        }
+
+
+        //main function 
+        function calculateDistances() {
+            const staticPoint = { lat: 37.7749, lon: -122.4194 }; // replace it with bus lat and long
+            const points = [
+                // { lat:  37.774931, lon: -122.419147 }, // 22 metres 
+                { lat: 37.774931,lon : -122.419288} , // 10 metres
+                { lat: 37.774931,lon : -122.419288} ,
+                { lat: 37.774931,lon : -122.419288},
+                { lat: 37.774931,lon : -122.419288},
+                { lat: 37.774931,lon : -122.419288}
+            ];
+
+            
+            var points_in_meters = [];
+            points.forEach((point, index) => {
+                const distance = haversine(staticPoint.lat, staticPoint.lon, point.lat, point.lon).toFixed(2);
+                points_in_meters.push(distance);
+                
+            });
+
+            // document.getElementById("output").innerHTML = result;
+            drawCircleWithPoints(points_in_meters);
+            
+        }
+
+        // Call the function to draw the circle with points
+        calculateDistances();
+
+    </script>
+</body>
+</html>
