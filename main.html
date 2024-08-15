@@ -113,13 +113,13 @@
         }
 
 
-        //main function 
+        //main function - static
         function calculateDistances() {
             const staticPoint = { lat: 37.7749, lon: -122.4194 }; // replace it with bus lat and long
             const points = [
-                // { lat:  37.774931, lon: -122.419147 }, // 22 metres 
+                { lat:  37.774931, lon: -122.419147 }, // 22 metres 
                 { lat: 37.774931,lon : -122.419288} , // 10 metres
-                { lat: 37.774931,lon : -122.419288} ,
+                { lat: 37.774931,lon : -122.419288} , 
                 { lat: 37.774931,lon : -122.419288},
                 { lat: 37.774931,lon : -122.419288},
                 { lat: 37.774931,lon : -122.419288}
@@ -138,7 +138,32 @@
             
         }
 
+        //main function - dynamic
+        function calculateDistances_dynamic(origin,stu1,stu2,stu3,stu4,stu5) {
+            const staticPoint = origin; //bus lat and long
+            const points = [
+                stu1,
+                stu2,
+                stu3,
+                stu4,
+                stu5
+            ];
+
+            
+            var points_in_meters = [];
+            points.forEach((point, index) => {
+                const distance = haversine(staticPoint.lat, staticPoint.lon, point.lat, point.lon).toFixed(2);
+                points_in_meters.push(distance);
+                
+            });
+
+            // document.getElementById("output").innerHTML = result;
+            drawCircleWithPoints(points_in_meters);
+            
+        }
+
         // Call the function to draw the circle with points
+        
         calculateDistances();
 
     </script>
